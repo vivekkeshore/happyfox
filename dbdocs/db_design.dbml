@@ -1,0 +1,204 @@
+// https://dbdocs.io/vivekkeshore/HappyFoxAssignment
+
+Project HappyFoxAssignment {
+    database_type: 'PostgreSQL'
+    Note: 'Database Design of the HappyFox Gmail utility tools assignment.'
+}
+
+// schema - gmail
+Table gmail.message [note: 'schema - gmail'] {
+  id UUID [pk]
+  message_id varchar(32) [not null, unique]
+  thread_id varchar(32) [not null]
+  from_address varchar(256) [not null]
+  to text[] [not null]
+  cc text[]
+  bcc text[]
+  received_at timestamp [not null]
+  subject varchar(1024)
+  is_active boolean [not null, default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    message_id [name:'idx_message_message_id']
+    thread_id [name:'idx_message_thread_id']
+    subject [name:'idx_message_subject']
+    from_address [name:'idx_message_from_address']
+  }
+}
+
+// schema - gmail
+Table gmail.message_detail [note: 'schema - gmail'] {
+  id UUID [pk]
+  message_id varchar(32) [not null]
+  text_body text
+  html_body text
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  indexes {
+    message_id [name:'idx_message_details_message_id']
+  }
+}
+
+// schema - gmail
+Table gmail.message_attachment [note: 'schema - gmail'] {
+    id uuid [pk]
+    message_id varchar(32) [not null]
+    file_name varchar(512) [not null]
+    file_url varchar(4096) [note: 'URL of the attachment file, example S3 location.']
+    mime_type varchar(256) [not null]
+    size int [not null]
+    attachment_id varchar(1024) [not null]
+    created_at timestamp [default: `now()`]
+    modified_at timestamp [default: `now()`]
+
+    Indexes {
+        message_id [name:'idx_message_attachment_message_id']
+    }
+}
+
+// schema - gmail
+Table gmail.label [note: 'schema - gmail'] {
+    id uuid [pk]
+    label_id varchar(32) [not null]
+    name varchar(256) [not null]
+    type varchar(50) [not null]
+    is_active boolean [not null, default: true]
+    created_at timestamp [default: `now()`]
+    updated_at timestamp [default: `now()`]
+
+    Indexes {
+        label_id [name:'idx_label_label_id']
+        name [name:'idx_label_name']
+    }
+}
+
+// schema - gmail
+Table gmail.message_label [note: 'schema - gmail'] {
+    id uuid [pk]
+    message_id varchar(32) [not null]
+    label_id varchar(32) [not null]
+    created_at timestamp [default: `now()`]
+    updated_at timestamp [default: `now()`]
+
+    Indexes {
+        message_id [name:'idx_message_label_message_id']
+        label_id [name:'idx_message_label_label_id']
+    }
+}
+
+
+Enum operation {
+    EQUALS
+    NOT_EQUALS
+    CONTAINS
+    NOT_CONTAINS
+    LESS_THAN
+    GREATER_THAN
+    LESS_THAN_EQUALS
+    GREATER_THAN_EQUALS
+    IN
+    NOT_IN
+}
+
+Enum filter_field_type {
+    STRING
+    NUMBER
+    DATETIME
+    BOOL
+}
+
+Enum field_unit {
+    MINUTES
+    HOURS
+    DAYS
+    MONTHS
+    YEARS
+}
+
+
+// schema - workflow
+Table workflow.filter_field [note: 'schema - workflow'] {
+    id uuid [pk]
+    field_name varchar(256) [not null, unique]
+    field_type filter_field_type [not null]
+    allowed_operations operation[] [not null]
+    is_column boolean [not null]
+    schema varchar(256) [note: 'Schema name of the table where the field is present.']
+    table varchar(256) [note: 'Table name where the field is present.']
+    column varchar(256) [note: 'Column name of the field in the table.']
+    created_at timestamp [default: `now()`]
+    updated_at timestamp [default: `now()`]
+
+    Indexes {
+        field_name [name:'idx_filter_field_field_name']
+    }
+}
+
+Enum rule_predicate {
+    ALL
+    ANY
+}
+
+// schema - workflow
+Table workflow.rule [note: 'schema - workflow'] {
+    id uuid [pk]
+    name varchar(256) [not null, unique]
+    description varchar(512)
+    predicate rule_predicate [not null]
+    created_at timestamp [default: `now()`]
+    updated_at timestamp [default: `now()`]
+
+    Indexes {
+        name [name:'idx_filter_rule_name']
+    }
+}
+
+// schema - workflow
+Table workflow.rule_details [note: 'schema - workflow'] {
+    id uuid [pk]
+    rule_id uuid [not null]
+    field_name varchar(256) [not null]
+    filter_field_id uuid [not null]
+    operation operation [not null]
+    value varchar(256) [not null]
+    unit field_unit
+    created_at timestamp [default: `now()`]
+    updated_at timestamp [default: `now()`]
+
+    Indexes {
+        rule_id [name:'idx_rule_details_rule_id']
+        filter_field_id [name:'idx_rule_details_filter_field_id']
+    }
+}
+
+Enum action_type {
+    MOVE
+    DELETE
+    MARK_AS_READ
+    MARK_AS_UNREAD
+    FORWARD
+}
+
+// schema - workflow
+Table workflow.rule_action [note: 'schema - workflow'] {
+    id uuid [pk]
+    rule_id uuid [not null]
+    action action_type [not null]
+    value varchar(256)
+    created_at timestamp [default: `now()`]
+    updated_at timestamp [default: `now()`]
+
+    Indexes {
+        rule_id [name:'idx_rule_action_rule_id']
+    }
+}
+
+Ref: gmail.message_detail.message_id > gmail.message.message_id
+Ref: gmail.message_attachment.message_id > gmail.message.message_id
+Ref: gmail.message_label.message_id > gmail.message.message_id
+Ref: gmail.message_label.label_id > gmail.label.label_id
+Ref: workflow.rule_details.rule_id > workflow.rule.id
+Ref: workflow.rule_details.filter_field_id > workflow.filter_field.id
+Ref: workflow.rule_action.rule_id > workflow.rule.id

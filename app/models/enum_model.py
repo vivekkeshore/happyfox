@@ -1,0 +1,43 @@
+from enum import Enum
+from app.lib import constants
+
+
+class Operation(str, Enum):
+	EQUALS = constants.FIELD_OPERATION_EQUALS
+	NOT_EQUALS = constants.FIELD_OPERATION_NOT_EQUALS
+	CONTAINS = constants.FIELD_OPERATION_CONTAINS
+	NOT_CONTAINS = constants.FIELD_OPERATION_NOT_CONTAINS
+	LESS_THAN = constants.FIELD_OPERATION_LESS_THAN
+	GREATER_THAN = constants.FIELD_OPERATION_GREATER_THAN
+	LESS_THAN_EQUALS = constants.FIELD_OPERATION_LESS_THAN_EQUALS
+	GREATER_THAN_EQUALS = constants.FIELD_OPERATION_GREATER_THAN_EQUALS
+	IN = constants.FIELD_OPERATION_IN
+	NOT_IN = constants.FIELD_OPERATION_NOT_IN
+
+
+class FieldType(str, Enum):
+	STRING = constants.FIELD_TYPE_STRING
+	NUMBER = constants.FIELD_TYPE_NUMBER
+	BOOLEAN = constants.FIELD_TYPE_BOOLEAN
+	DATETIME = constants.FIELD_TYPE_DATETIME
+
+
+class FieldUnit(str, Enum):
+	MINUTES = constants.FIELD_UNIT_MINUTES
+	HOURS = constants.FIELD_UNIT_HOURS
+	DAYS = constants.FIELD_UNIT_DAYS
+	MONTHS = constants.FIELD_UNIT_MONTHS
+	YEARS = constants.FIELD_UNIT_YEARS
+
+
+class RulePredicate(str, Enum):
+	ANY = constants.RULE_PREDICATE_ANY
+	ALL = constants.RULE_PREDICATE_ALL
+
+
+class ActionType(str, Enum):
+	MOVE = constants.ACTION_TYPE_MOVE
+	MARK_AS_READ = constants.ACTION_TYPE_MARK_AS_READ
+	MARK_AS_UNREAD = constants.ACTION_TYPE_MARK_AS_UNREAD
+	DELETE = constants.ACTION_TYPE_DELETE
+	FORWARD = constants.ACTION_TYPE_FORWARD
