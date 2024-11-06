@@ -1,0 +1,58 @@
+{
+  "Rule 1": {
+    "name": "Rule 1",
+    "predicate": "ANY",
+    "rule_details": [
+      {
+        "field_name": "has_attachment",
+        "operation": "EQUALS",
+        "value": "true",
+        "unit": null
+      },
+      {
+        "field_name": "subject",
+        "operation": "CONTAINS",
+        "value": "test",
+        "unit": null
+      }
+    ],
+    "actions": [
+      {
+        "action": "MOVE",
+        "value": "Travel"
+      },
+      {
+        "action": "MARK_AS_READ",
+        "value": null
+      }
+    ]
+  },
+  "Rule 2": {
+    "name": "Rule 2",
+    "predicate": "ANY",
+    "rule_details": [
+      {
+        "field_name": "has_attachment",
+        "operation": "EQUALS",
+        "value": "true",
+        "unit": null
+      },
+      {
+        "field_name": "subject",
+        "operation": "CONTAINS",
+        "value": "test",
+        "unit": null
+      }
+    ],
+    "actions": [
+      {
+        "action": "MOVE",
+        "value": "INBOX"
+      },
+      {
+        "action": "MARK_AS_UNREAD",
+        "value": null
+      }
+    ]
+  }
+}
